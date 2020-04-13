@@ -1,6 +1,7 @@
 package com.jarogoose.arena;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Display {
@@ -26,20 +27,18 @@ public class Display {
   public static final String BG_CYAN = "\u001B[46m";
   public static final String BG_WHITE = "\u001B[47m";
 
-  private final String[][] grid;
-  private final List<Player> players = new ArrayList<>();
+  private static final String[][] grid = new String[Arena.SIZE][Arena.SIZE];
+  private static final List<Player> PLAYERS = new ArrayList<>();
 
-  public Display(final int size) {
-    grid = new String[size][size];
-
+  public static void init() {
     grid[0][0] = "0";
 
     System.out.print(WHITE);
-    for (int x = 1; x < size; x++) {
+    for (int x = 1; x < Arena.SIZE; x++) {
       grid[0][x] = String.valueOf(x);
     }
 
-    for (int y = 1; y < size; y++) {
+    for (int y = 1; y < Arena.SIZE; y++) {
       grid[y][0] = String.valueOf(y);
     }
     System.out.print(RESET);
@@ -47,24 +46,24 @@ public class Display {
     drawField();
   }
 
-  public void clear() {
+  public static void clear() {
     System.out.print(CLEAR_CONSOLE);
   }
 
-  public void addPlayers(List<Player> players) {
-    this.players.addAll(players);
+  public static void addPlayers(Collection<Player> players) {
+    PLAYERS.addAll(players);
   }
 
-  public void render() {
-    clear();
+  public static void render() {
+//    clear();
     drawField();
-    int size = grid.length;
+    int size = Arena.SIZE;
     for (int y = size - 1; y >= 0; y--) {
       for (int x = 0; x < size; x++) {
         if (x == 0 || y == 0) {
-          System.out.print(BG_BLACK + WHITE + grid[y][x] + " ");
+          System.out.print(BG_BLACK + WHITE + grid[y][x] + " " + RESET);
         } else {
-          System.out.print(BG_YELLOW + BLACK + grid[y][x] + " ");
+          System.out.print(BG_YELLOW + BLACK + grid[y][x] + " " + RESET);
         }
       }
       System.out.println();
@@ -72,19 +71,39 @@ public class Display {
     System.out.print(RESET);
   }
 
-  public String cell(final int x, final int y) {
+  public static String cell(final int x, final int y) {
     return grid[y][x];
   }
 
-  private void drawField() {
-    for (int x = 1; x < grid.length; x++) {
-      for (int y = 1; y < grid.length; y++) {
+  private static void drawField() {
+    for (int x = 1; x < Arena.SIZE; x++) {
+      for (int y = 1; y < Arena.SIZE; y++) {
         grid[y][x] = " ";
       }
     }
 
-    for (Player player : players) {
+    for (Player player : PLAYERS) {
       grid[player.y()][player.x()] = player.alias();
     }
+  }
+
+  public static void round() {
+    System.out.println("Round -> " + Arena.round());
+  }
+
+  public static void playerInfo(Player player) {
+    System.out.println(player.info());
+  }
+
+  public static void rolls(Player player, List<Integer> rolls) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(player.alias()).append(" ");
+
+    for (int i = rolls.size() - 1; i >= 0; i--) {
+      sb.append(" |").append(rolls.get(i)).append("|");
+
+    }
+
+    System.out.println(sb.toString());
   }
 }

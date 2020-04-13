@@ -1,8 +1,17 @@
 package com.jarogoose.arena;
 
-import java.util.Arrays;
+import java.util.Random;
 
 public class Player {
+
+  public enum Status {
+    ACTIVE,
+    YIELD,
+    INJURED,
+    DECAPITATED;
+  }
+
+  private Status status = Status.ACTIVE;
 
   private final String name;
 
@@ -68,28 +77,24 @@ public class Player {
     return this.name.substring(0, 1);
   }
 
+  public Status status() {
+    return this.status;
+  }
+
   public int[] hit() {
-    int[] rolls = new int[atk()];
-    for (int i = 0; i < atk(); i++) {
-      rolls[i] = Dice.roll();
-    }
-    return rolls;
+    return Dice.roll(atk());
   }
 
   public int[] block() {
-    int[] rolls = new int[def()];
-    for (int i = 0; i < def(); i++) {
-      rolls[i] = Dice.roll();
-    }
-    return rolls;
+    return Dice.roll(def());
   }
 
   public int[] initiative() {
-    int[] rolls = new int[spd()];
-    for (int i = 0; i < spd(); i++) {
-      rolls[i] = Dice.roll();
-    }
-    return rolls;
+    return Dice.roll(spd());
+  }
+
+  public int hp() {
+    return atk() + def() + spd();
   }
 
   public String info() {
@@ -98,5 +103,40 @@ public class Player {
         + Display.RED + atk() + space + Display.RESET
         + Display.PURPLE + def() + space + Display.RESET
         + Display.BLUE + spd() + space + Display.RESET;
+  }
+
+  public void take(int wounds) {
+    final int expectedHp = hp() - wounds;
+
+    final int atkIndex = 0;
+    final int defIndex = 1;
+    final int spdIndex = 2;
+
+    if (hp() - wounds == 2) {
+      status = Status.YIELD;
+      return;
+    }
+    if (hp() - wounds == 1) {
+      status = Status.INJURED;
+      return;
+    }
+    if (hp() - wounds <= 0) {
+      status = Status.DECAPITATED;
+      return;
+    }
+
+    Random random = new Random();
+    while (hp() > 3 && hp() > expectedHp) {
+      final int index = random.nextInt(3); // randomly determine which parameter to decrease.
+      if (index == atkIndex && atk() > 1) {
+        atk--;
+      }
+      if (index == defIndex && def() > 1) {
+        def--;
+      }
+      if (index == spdIndex && spd() > 1) {
+        spd--;
+      }
+    }
   }
 }
