@@ -61,9 +61,9 @@ public class Display {
     for (int y = size - 1; y >= 0; y--) {
       for (int x = 0; x < size; x++) {
         if (x == 0 || y == 0) {
-          System.out.print(BG_BLACK + WHITE + grid[y][x] + " " + RESET);
+          System.out.print(BG_BLACK + WHITE + grid[y][x] + " " + RESET); // draw coord
         } else {
-          System.out.print(BG_YELLOW + BLACK + grid[y][x] + " " + RESET);
+          System.out.print(BG_YELLOW + BLACK + grid[y][x] + " " + RESET); // set a player
         }
       }
       System.out.println();
